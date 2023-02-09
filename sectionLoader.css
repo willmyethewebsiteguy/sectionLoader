@@ -5,6 +5,9 @@
 ========== */
 
 /*BASE STYLES*/
+.wm-load-container{
+  overflow: hidden;
+}
 .wm-load-container .page-section{
   padding:0 !important;
   min-height: unset !important;
