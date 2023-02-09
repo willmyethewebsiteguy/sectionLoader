@@ -8,12 +8,15 @@
 .wm-load-container{
   overflow: hidden;
 }
-.wm-load-container .page-section{
-  padding:0 !important;
+.wm-load-container > *{
+  margin: var(--outer-spacing) !important;
+  padding: var(--inner-spacing) !important;
   min-height: unset !important;
+  position: relative;
+  box-sizing:border-box;
 }
 .wm-load-container .content-wrapper{
-  padding:0 !important;
+  padding: 0 !important;
 }
 .wm-load-container .content-wrapper > .content{
   width:100% !important;
