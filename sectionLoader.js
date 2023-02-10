@@ -86,6 +86,7 @@
     function loadSquarespaceContent(instance){
       let container = instance.elements.container;
       Squarespace.initializeLayoutBlocks(Y, Y.one(container));
+      Squarespace.initializeNativeVideo(Y, Y.one(container))
     }
 
     function pushScripts(instance){
