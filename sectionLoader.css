@@ -58,6 +58,17 @@
   text-align:center;
 }
 
+/*Background Image Positioning*/
+img.wm-image-loaded{
+  --x: 50%;
+  --y: 50%;
+  object-fit: cover;
+  object-position: var(--x) var(--y);
+  width: 100%;
+  height: 100%;
+}
+
+
 /*Fluid Engine Blocks In Classic Editor*/
 .sqs-grid-12 .wm-load-container .fluid-engine .sqs-block{
   padding: 0;
