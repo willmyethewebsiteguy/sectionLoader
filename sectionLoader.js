@@ -16,7 +16,8 @@
     },
     async getHTML(url, selector = null) {
       try {
-        let response = await fetch(`${url}`);
+        let response = await fetch(`${url}`),
+            selector = utils.templateVersion == '7' ? 'main section' : '#sections' ;
 
         // If the call failed, throw an error
         if (!response.ok) {
@@ -25,7 +26,7 @@
 
         let data = await response.text(),
             frag = document.createRange().createContextualFragment(data),
-            section = frag.querySelector('#sections').innerHTML;
+            section = frag.querySelector(selector).innerHTML;
 
         if (selector) section = frag.querySelector(selector).innerHTML;
 
@@ -52,6 +53,7 @@
     },
     loaders:document.querySelectorAll('[data-wm-plugin="load"]').length,
     loaded:0,
+    templateVersion: Static.SQUARESPACE_CONTEXT.templateVersion,
     loadScripts: []
   };
   
@@ -85,8 +87,8 @@
   let LoadContent = (function () {    
     function loadSquarespaceContent(instance){
       let container = instance.elements.container;
-      Squarespace.initializeLayoutBlocks(Y, Y.one(container));
-      Squarespace.initializeNativeVideo(Y, Y.one(container))
+      window.Squarespace?.initializeLayoutBlocks(Y, Y.one(container));
+      window.Squarespace?.initializeNativeVideo(Y, Y.one(container));
     }
 
     function pushScripts(instance){
@@ -177,7 +179,7 @@
           return this.container.querySelectorAll('.section-background > img:not(.wm-image-loaded)');
         }
       };
-            
+                  
       instance.elements.container.classList.add('wm-load-container')
       buildHTML(instance);
     }
