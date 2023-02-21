@@ -1,5 +1,5 @@
 /* =========
-  Content Loader TESTING
+  Content Loader
   Load Content anywhere you need it
   This Code is Licensed by Will-Myers.com
 ========== */
@@ -17,7 +17,7 @@
     async getHTML(url, selector = null) {
       try {
         let response = await fetch(`${url}`),
-            selector = utils.templateVersion == '7' ? 'main section' : '#sections' ;
+            selector = utils.templateVersion == '7' ? 'main > *:first-child' : '#sections' ;
 
         // If the call failed, throw an error
         if (!response.ok) {
@@ -194,5 +194,6 @@
     }
   }
   initContentLoads();
+  window.addEventListener('mercury:load', initContentLoads)
   window.wmInitContentLoad = initContentLoads;
 }());
