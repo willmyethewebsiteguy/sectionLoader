@@ -190,6 +190,7 @@
   let initContentLoads = () => {
     let contentLoads = document.querySelectorAll('[data-wm-plugin="load"]');
     for (let el of contentLoads) {
+      if (el.classList.contains('wm-load-container')) continue;
       new LoadContent(el);
     }
   }
