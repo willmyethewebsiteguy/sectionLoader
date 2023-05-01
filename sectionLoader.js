@@ -102,10 +102,13 @@
     
     function pushSqsSpecificScripts(instance) {
       /*Like Background Videos*/
-      let hasBkgVideos = instance.elements.bkgVideos;
+      let hasBkgVideos = instance.elements.bkgVideos.length;
+      let hasListSection = instance.elements.listSection.length;
+      let hasGallerySection = instance.elements.gallerySection.length;
       
-      /*If Background Video*/
-      if (hasBkgVideos.length) {
+      
+      /*If Background Video or Gallery Section*/
+      if (hasBkgVideos || hasListSection || hasGallerySection) {
         let sqsLoaderScript = document.querySelector('body > [src*="https://static1.squarespace.com/static/vta"]');
         utils.loadScripts.push(sqsLoaderScript)
       }
@@ -134,7 +137,6 @@
           selector = instance.settings.selector;
       
       let html = await utils.getHTML(url, selector);
-
       container.insertAdjacentHTML('afterbegin', html);
       loadSquarespaceContent(instance);
       pushScripts(instance);
@@ -177,9 +179,15 @@
         },
         get bkgImages() {
           return this.container.querySelectorAll('.section-background > img:not(.wm-image-loaded)');
+        },
+        get listSection() {
+          return this.container.querySelectorAll('.page-section.user-items-list-section');
+        },
+        get gallerySection() {
+          return this.container.querySelectorAll('.page-section.gallery-section');
         }
       };
-                  
+
       instance.elements.container.classList.add('wm-load-container')
       buildHTML(instance);
     }
