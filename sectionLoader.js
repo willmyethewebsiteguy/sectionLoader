@@ -60,6 +60,7 @@
   function loadScripts() {
     if (!utils.loadScripts.length) return;
     let hasLoaded = [];
+
     for (let el of utils.loadScripts){
       if (hasLoaded.includes(el.src) || hasLoaded.includes(el.innerHTML)) continue;
       const script = document.createElement('script');
@@ -146,6 +147,10 @@
       if (utils.loaded == utils.loaders) {
         loadScripts();
       }
+      document.dispatchEvent(new CustomEvent('wmSectionLoader:loaded', {
+        bubbles: true, 
+        cancelable: true
+      }));
 
       return container;
     }
