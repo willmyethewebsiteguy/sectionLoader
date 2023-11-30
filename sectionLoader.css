@@ -68,6 +68,11 @@ img.wm-image-loaded{
   height: 100%;
 }
 
+/*Inset Background Images*/
+.wm-load-container section.background-width--inset .content-wrapper > * {
+  padding: var(--sqs-site-gutter, 4vw);
+}
+
 
 /*Fluid Engine Blocks In Classic Editor*/
 .sqs-grid-12 .wm-load-container .fluid-engine .sqs-block{
