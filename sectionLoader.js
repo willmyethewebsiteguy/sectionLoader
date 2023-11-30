@@ -60,9 +60,8 @@
   function loadScripts() {
     if (!utils.loadScripts.length) return;
     let hasLoaded = [];
-
     for (let el of utils.loadScripts){
-      if (hasLoaded.includes(el.src) || hasLoaded.includes(el.innerHTML)) continue;
+      if (hasLoaded.includes(el.src) || hasLoaded.includes(el.innerHTML) || el.type == 'application/json') continue;
       const script = document.createElement('script');
       script.src = el.src;
       script.async = el.async;
@@ -106,12 +105,18 @@
       let hasBkgVideos = instance.elements.bkgVideos.length;
       let hasListSection = instance.elements.listSection.length;
       let hasGallerySection = instance.elements.gallerySection.length;
+      let hasBkgFx = instance.elements.bkgFx.length;
+      let hasColorThemeStyles = document.head.querySelector('#colorThemeStyles');
       
       
       /*If Background Video or Gallery Section*/
-      if (hasBkgVideos || hasListSection || hasGallerySection) {
+      if (hasBkgVideos || hasListSection || hasGallerySection || hasBkgFx) {
         let sqsLoaderScript = document.querySelector('body > [src*="https://static1.squarespace.com/static/vta"]');
         utils.loadScripts.push(sqsLoaderScript)
+      }
+
+      if (hasColorThemeStyles) {
+        //addModifiedStyleElement(hasColorThemeStyles)
       }
     }
     
@@ -184,6 +189,9 @@
         },
         get bkgImages() {
           return this.container.querySelectorAll('.section-background > img:not(.wm-image-loaded)');
+        },
+        get bkgFx() {
+          return this.container.querySelectorAll('.background-fx-canvas');
         },
         get listSection() {
           return this.container.querySelectorAll('.page-section.user-items-list-section');
