@@ -89,6 +89,8 @@
       let container = instance.elements.container;
       window.Squarespace?.initializeLayoutBlocks(Y, Y.one(container));
       window.Squarespace?.initializeNativeVideo(Y, Y.one(container));
+      window.Squarespace?.initializePageContent(Y, Y.one(container))
+
     }
 
     function pushScripts(instance){
@@ -107,7 +109,6 @@
       let hasGallerySection = instance.elements.gallerySection.length;
       let hasBkgFx = instance.elements.bkgFx.length;
       let hasColorThemeStyles = document.head.querySelector('#colorThemeStyles');
-      
       
       /*If Background Video or Gallery Section*/
       if (hasBkgVideos || hasListSection || hasGallerySection || hasBkgFx) {
