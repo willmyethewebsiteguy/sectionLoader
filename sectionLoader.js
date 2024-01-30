@@ -51,8 +51,8 @@
 
       return value;
     },
-    loaders:document.querySelectorAll('[data-wm-plugin="load"]').length,
-    loaded:0,
+    loaders: document.querySelectorAll('[data-wm-plugin="load"]').length,
+    loaded: 0,
     templateVersion: Static.SQUARESPACE_CONTEXT.templateVersion,
     loadScripts: []
   };
@@ -153,10 +153,10 @@
       if (utils.loaded == utils.loaders) {
         loadScripts();
       }
-      document.dispatchEvent(new CustomEvent('wmSectionLoader:loaded', {
-        bubbles: true, 
-        cancelable: true
-      }));
+      utils.emitEvent('wmSectionLoader:loaded', {
+        block: container,
+        target: target ? target : null
+      });
 
       return container;
     }
