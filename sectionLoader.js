@@ -56,32 +56,50 @@
     templateVersion: Static.SQUARESPACE_CONTEXT.templateVersion,
     loadScripts: []
   };
-  
+
   function loadScripts() {
     if (!utils.loadScripts.length) return;
-    let hasLoaded = [];
-    for (let el of utils.loadScripts){
-      if (hasLoaded.includes(el.src) || hasLoaded.includes(el.innerHTML) || el.type == 'application/json') continue;
-      const script = document.createElement('script');
-      script.src = el.src;
-      script.async = el.async;
-
-      script.onload = () => {
-        //console.log(`${el.src} loaded successfuly`);
-      };
-
-      script.onerror = () => {
-        //console.log(`Error occurred while loading ${el.src}`);
-      };
-
-      if (el.innerHTML) {
-        eval(el.innerHTML);
-        hasLoaded.push(el.innerHTML)
-      } else {
-        document.body.appendChild(script);
-        hasLoaded.push(el.src)
-      }
+  
+    const hasLoaded = [];
+    const scriptPromises = [];
+  
+    for (let el of utils.loadScripts) {
+      if (hasLoaded.includes(el.src) || hasLoaded.includes(el.innerHTML) || el.type === 'application/json') continue;
+  
+      const promise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = el.src;
+        script.async = el.async;
+        script.onload = () => {
+          //console.log(`${el.src} loaded successfully`);
+          resolve();
+        };
+        script.onerror = () => {
+          //console.log(`Error occurred while loading ${el.src}`);
+          reject();
+        };
+  
+        if (el.innerHTML) {
+          eval(el.innerHTML);
+          hasLoaded.push(el.innerHTML);
+          resolve();
+        } else {
+          document.body.appendChild(script);
+          hasLoaded.push(el.src);
+        }
+      });
+  
+      scriptPromises.push(promise);
     }
+  
+    Promise.allSettled(scriptPromises)
+      .then(() => {
+        // All scripts have loaded, fire the custom event
+        utils.emitEvent('wmSectionLoader:scriptsLoaded');
+      })
+      .catch(error => {
+        console.error('Error loading scripts:', error);
+      });
   }
 
   let LoadContent = (function () {    
@@ -90,7 +108,6 @@
       window.Squarespace?.initializeLayoutBlocks(Y, Y.one(container));
       window.Squarespace?.initializeNativeVideo(Y, Y.one(container));
       window.Squarespace?.initializePageContent(Y, Y.one(container))
-
     }
 
     function pushScripts(instance){
