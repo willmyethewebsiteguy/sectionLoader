@@ -108,6 +108,7 @@
       window.Squarespace?.initializeLayoutBlocks(Y, Y.one(container));
       window.Squarespace?.initializeNativeVideo(Y, Y.one(container));
       window.Squarespace?.initializePageContent(Y, Y.one(container))
+      window.Squarespace?.initializeCommerce(Y, Y.one(container))
     }
 
     function pushScripts(instance){
@@ -122,13 +123,14 @@
     function pushSqsSpecificScripts(instance) {
       /*Like Background Videos*/
       let hasBkgVideos = instance.elements.bkgVideos.length;
+      let hasProductItems = instance.elements.productItems.length;
       let hasListSection = instance.elements.listSection.length;
       let hasGallerySection = instance.elements.gallerySection.length;
       let hasBkgFx = instance.elements.bkgFx.length;
       let hasColorThemeStyles = document.head.querySelector('#colorThemeStyles');
       
       /*If Background Video or Gallery Section*/
-      if (hasBkgVideos || hasListSection || hasGallerySection || hasBkgFx) {
+      if (hasBkgVideos || hasListSection || hasGallerySection || hasBkgFx || hasProductItems) {
         let sqsLoaderScript = document.querySelector('body > [src*="https://static1.squarespace.com/static/vta"]');
         utils.loadScripts.push(sqsLoaderScript)
       }
@@ -210,6 +212,9 @@
         },
         get bkgFx() {
           return this.container.querySelectorAll('.background-fx-canvas');
+        },
+        get productItems() {
+          return this.container.querySelectorAll('article.ProductItem .ProductItem-summary');
         },
         get listSection() {
           return this.container.querySelectorAll('.page-section.user-items-list-section');
