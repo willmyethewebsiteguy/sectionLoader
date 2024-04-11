@@ -78,8 +78,10 @@
           //console.log(`Error occurred while loading ${el.src}`);
           reject();
         };
+
+        const isInternalScript = !!el.innerHTML.trim();
   
-        if (el.innerHTML) {
+        if (isInternalScript) {
           eval(el.innerHTML);
           hasLoaded.push(el.innerHTML);
           resolve();
@@ -110,7 +112,6 @@
       window.Squarespace?.initializePageContent(Y, Y.one(container))
       initializeCommerce(container)
     }
-
     function initializeCommerce(container) {
       // Re-initializing Commerce can be risky. 
       // Remove all "add to cart buttons" first and replace them
