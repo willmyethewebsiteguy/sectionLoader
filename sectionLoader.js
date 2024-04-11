@@ -108,7 +108,27 @@
       window.Squarespace?.initializeLayoutBlocks(Y, Y.one(container));
       window.Squarespace?.initializeNativeVideo(Y, Y.one(container));
       window.Squarespace?.initializePageContent(Y, Y.one(container))
-      window.Squarespace?.initializeCommerce(Y, Y.one(container))
+      initializeCommerce(container)
+    }
+
+    function initializeCommerce(container) {
+      // Re-initializing Commerce can be risky. 
+      // Remove all "add to cart buttons" first and replace them
+      // so you don't double add products
+      const shouldInitialize = !!container.querySelectorAll(
+        '.sqs-add-to-cart-button',
+      ).length;
+      const allAddToCartButtons = document.querySelectorAll('.sqs-add-to-cart-button');
+      
+      if (shouldInitialize) {
+        // For each button, replace it with a clone to remove event listeners
+        allAddToCartButtons.forEach(button => {
+          const clone = button.cloneNode(true);
+          button.parentNode.replaceChild(clone, button);
+        });
+        // Reinitialize Squarespace Commerce
+        Y.Squarespace.Commerce.initializeCommerce();
+      }
     }
 
     function pushScripts(instance){
@@ -119,7 +139,6 @@
       if (!scripts.length) return;
       scripts.forEach(el => utils.loadScripts.push(el))
     }
-    
     function pushSqsSpecificScripts(instance) {
       /*Like Background Videos*/
       let hasBkgVideos = instance.elements.bkgVideos.length;
@@ -128,6 +147,7 @@
       let hasGallerySection = instance.elements.gallerySection.length;
       let hasBkgFx = instance.elements.bkgFx.length;
       let hasColorThemeStyles = document.head.querySelector('#colorThemeStyles');
+      let hasShapeBlocks = instance.elements.shapeBlocks.length;
       
       /*If Background Video or Gallery Section*/
       if (hasBkgVideos || hasListSection || hasGallerySection || hasBkgFx || hasProductItems) {
@@ -135,11 +155,14 @@
         utils.loadScripts.push(sqsLoaderScript)
       }
 
+      if (hasShapeBlocks) {
+        loadShapeBlocks(instance)
+      }
+
       if (hasColorThemeStyles) {
         //addModifiedStyleElement(hasColorThemeStyles)
       }
     }
-    
     function imageLoader(instance) {
       //if (!document.body.classList.contains('sqs-edit-mode')) return;
       let bkgImages = instance.elements.bkgImages;
@@ -154,6 +177,44 @@
         el.dataset.load = true;
         el.src = el.dataset.src
       })
+    }
+    function loadShapeBlocks(instance) {
+      if (document.querySelector('style#wm-shape-block-styles')) return;
+      addStyles();
+
+      function addStyles() {
+        const styleContent = `
+          .sqs-block[data-definition-name="website.components.shape"] svg.sqs-shape {
+            fill: var(--shape-block-background-color);
+            stroke: var(--shape-block-stroke-color);
+          }
+          .sqs-block[data-definition-name="website.components.shape"] .sqs-shape-rectangle {
+            background: var(--shape-block-background-color);
+            border-color: var(--shape-block-stroke-color);
+          }
+          .sqs-block[data-definition-name="website.components.shape"] .sqs-block-content,
+          .sqs-block[data-definition-name="website.components.shape"] .sqs-block-alignment-wrapper {
+            height: 100%;
+          }
+          .sqs-block[data-definition-name="website.components.shape"] .sqs-block-alignment-wrapper {
+            display: flex;
+          }
+          .sqs-block[data-definition-name="website.components.shape"] .sqs-shape {
+            display: block;
+            position: absolute;
+            overflow: visible;
+          }
+          .sqs-block[data-definition-name="website.components.shape"] .sqs-shape-block-container {
+            position: relative;
+            color: var(--shape-block-dropshadow-color);
+          }`;
+          
+        const styleElement = document.createElement('style');
+        styleElement.id = 'wm-shape-block-styles'
+        styleElement.type = 'text/css';
+        styleElement.appendChild(document.createTextNode(styleContent));
+        document.head.appendChild(styleElement);
+      }
     }
 
     async function buildHTML(instance) {
@@ -215,6 +276,9 @@
         },
         get productItems() {
           return this.container.querySelectorAll('article.ProductItem .ProductItem-summary');
+        },
+        get shapeBlocks() {
+          return this.container.querySelectorAll('.sqs-block[data-definition-name="website.components.shape"]');
         },
         get listSection() {
           return this.container.querySelectorAll('.page-section.user-items-list-section');
