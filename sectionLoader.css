@@ -8,6 +8,9 @@
 .wm-load-container{
   overflow: hidden;
 }
+.wm-load-container.full-page > *:first-child{
+  padding-top: 0px !important;
+}
 .wm-load-container:not(.full-page) > *{
   margin: var(--outer-spacing) !important;
   padding: var(--inner-spacing) !important;
@@ -82,7 +85,7 @@ img.wm-image-loaded{
 /*Full Page*/
 .wm-load-container.full-page > *{
   position: relative;
-  box-sizing:border-box;
+  box-sizing: border-box;
 }
 .wm-load-container.full-page .fluid-engine {
   grid-template-columns: minmax(var(--grid-gutter), 1fr) repeat(24, minmax(0, var(--cell-max-width))) minmax(var(--grid-gutter), 1fr);
