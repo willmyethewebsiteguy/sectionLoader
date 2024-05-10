@@ -16,8 +16,12 @@
     },
     async getHTML(url, selector = null) {
       try {
-        let response = await fetch(`${url}`),
-            selector = utils.templateVersion == '7' ? 'main > *:first-child' : '#sections' ;
+        let response = await fetch(`${url}`);
+        let isUserValue = true;
+        if (!selector) {
+          selector = utils.templateVersion == '7' ? 'main > *:first-child' : '#sections' ;
+          isUserValue = false;
+        }
 
         // If the call failed, throw an error
         if (!response.ok) {
@@ -28,7 +32,7 @@
             frag = document.createRange().createContextualFragment(data),
             section = frag.querySelector(selector).innerHTML;
 
-        if (selector) section = frag.querySelector(selector).innerHTML;
+        if (isUserValue) section = frag.querySelector(selector).outerHTML;
 
         return section;
 
@@ -111,6 +115,7 @@
       window.Squarespace?.initializeNativeVideo(Y, Y.one(container));
       window.Squarespace?.initializePageContent(Y, Y.one(container))
       initializeCommerce(container)
+      
     }
     function initializeCommerce(container) {
       // Re-initializing Commerce can be risky. 
@@ -250,14 +255,16 @@
         },
         get url() {
           let target = this.target;
-          let url;
-          if (target.includes(' ')) url = target.split(' ')[0];
-          return target;
+          let url = this.target;
+          if (url.includes(' ')) url = target.split(' ')[0];
+          return url;
         },
         get selector() {
           let target = this.target;
-          let selector;
-          if (target.includes(' ')) selector = target.split(' ')[1];
+          let selector = null;
+          if (target.includes(' ')) {
+            selector = target.split(' ').slice(1).join(' ');
+          }
           return selector;
         }
       };
