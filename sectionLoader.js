@@ -117,6 +117,9 @@
       initializeCommerce(container)
       
     }
+    function initWMPlugins() {
+      window.wmListSectionSync?.init()
+    }
     function initializeCommerce(container) {
       // Re-initializing Commerce can be risky. 
       // Remove all "add to cart buttons" first and replace them
@@ -232,6 +235,7 @@
       let html = await utils.getHTML(url, selector);
       container.insertAdjacentHTML('afterbegin', html);
       loadSquarespaceContent(instance);
+      initWMPlugins();
       pushScripts(instance);
       pushSqsSpecificScripts(instance);
       imageLoader(instance);
