@@ -62,13 +62,17 @@
   };
 
   function loadScripts() {
-    if (!utils.loadScripts.length) return;
+    if (!utils.loadScripts.length) {
+      utils.emitEvent('wmSectionLoader:scriptsLoaded');
+      return;
+    }
   
     const hasLoaded = [];
     const scriptPromises = [];
   
     for (let el of utils.loadScripts) {
-      if (hasLoaded.includes(el.src) || hasLoaded.includes(el.innerHTML) || el.type === 'application/json') continue;
+      //if (hasLoaded.includes(el.src) || hasLoaded.includes(el.innerHTML) || el.type === 'application/json') continue;
+      if (el.type === 'application/json') continue;
   
       const promise = new Promise((resolve, reject) => {
         const script = document.createElement('script');
@@ -90,11 +94,12 @@
           hasLoaded.push(el.innerHTML);
           resolve();
         } else {
-          document.body.appendChild(script);
+          //document.body.appendChild(script);
+          el.parentNode.insertBefore(script, el);
+          el.parentNode.removeChild(el);
           hasLoaded.push(el.src);
         }
       });
-  
       scriptPromises.push(promise);
     }
   
@@ -115,7 +120,6 @@
       window.Squarespace?.initializeNativeVideo(Y, Y.one(container));
       window.Squarespace?.initializePageContent(Y, Y.one(container))
       initializeCommerce(container)
-      
     }
     function initWMPlugins() {
       window.wmListSectionSync?.init()
@@ -240,8 +244,11 @@
       pushSqsSpecificScripts(instance);
       imageLoader(instance);
       utils.loaded += 1;
+
       if (utils.loaded == utils.loaders) {
         loadScripts();
+      } else {
+        utils.emitEvent('wmSectionLoader:scriptsLoaded');
       }
       utils.emitEvent('wmSectionLoader:loaded', {
         block: container,
