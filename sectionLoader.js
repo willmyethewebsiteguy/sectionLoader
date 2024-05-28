@@ -179,7 +179,9 @@
     function imageLoader(instance) {
       //if (!document.body.classList.contains('sqs-edit-mode')) return;
       let bkgImages = instance.elements.bkgImages;
-      bkgImages.forEach(el => {
+      let summaryImages = instance.elements.summaryImages;
+      const images = [...bkgImages, ...summaryImages]
+      images.forEach(el => {
         el.classList.add('wm-image-loaded')
         let fData = el.dataset.imageFocalPoint.split(',');
         let focalPoint = {};
@@ -295,6 +297,9 @@
         },
         get productItems() {
           return this.container.querySelectorAll('article.ProductItem .ProductItem-summary');
+        },
+        get summaryImages() {
+          return this.container.querySelectorAll('.summary-item .summary-thumbnail img');
         },
         get shapeBlocks() {
           return this.container.querySelectorAll('.sqs-block[data-definition-name="website.components.shape"]');
