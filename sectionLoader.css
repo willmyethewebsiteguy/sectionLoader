@@ -97,3 +97,13 @@ img.wm-image-loaded{
     grid-template-columns: minmax(var(--grid-gutter), 1fr) repeat(8, minmax(0, var(--cell-max-width))) minmax(var(--grid-gutter), 1fr);
   }
 }
+
+/*Disable Section Dividers*/
+.wm-load-container .section-border {
+  clip-path: unset !important;
+  top: 0;
+}
+
+.has-section-divider:has([data-wm-section-divider-style]) + .page-section > .section-border {
+    top: calc(-1* var(--wm-adjusted-previous-section-divider-offset, var(--previous-section-divider-offset, 0px)));
+}
