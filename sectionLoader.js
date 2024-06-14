@@ -111,6 +111,40 @@
       .catch(error => {
         console.error('Error loading scripts:', error);
       });
+
+  }
+  
+  window.refactorSectionDividers = () => {
+    const loadSections = document.querySelectorAll('.page-section.has-section-divider:has(.wm-load-container)');
+
+    loadSections.forEach(section => {
+      if (section.querySelector(':scope > .section-divider-display style[data-wm-section-divider-style]')) return;
+      // Find the existing style element in the section
+      const dividerStyles = section.querySelector(':scope > .section-divider-display style[data-section-divider-style]');
+      if (!dividerStyles) return;
+      
+      // Find the next section or the section in the #footer-sections
+      let nextSection = section.nextElementSibling || document.querySelector('#footer-sections > .page-section');
+      if (!nextSection) return;
+    
+      // Get the new section ID from the next section
+      const newSectionId = nextSection?.getAttribute('data-section-id');
+      if (!newSectionId) return;
+    
+      // Extract the --divider-height value from the current section's custom properties
+      const dividerHeight = getComputedStyle(section).getPropertyValue('--divider-height').trim();
+      if (!dividerHeight) return;
+    
+      // Create the new CSS rule
+      const newRule = `[data-section-id="${newSectionId}"] { --wm-adjusted-previous-section-divider-offset: ${dividerHeight}; }`;
+    
+      // Create a new style element
+      const newStyleElement = document.createElement('style');
+      newStyleElement.setAttribute('data-wm-section-divider-style', '');
+      newStyleElement.textContent = newRule;
+
+      dividerStyles.parentNode.insertBefore(newStyleElement, dividerStyles.nextSibling);
+    })
   }
 
   let LoadContent = (function () {    
@@ -171,7 +205,7 @@
       if (hasShapeBlocks) {
         loadShapeBlocks(instance)
       }
-
+      window.refactorSectionDividers()
       if (hasColorThemeStyles) {
         //addModifiedStyleElement(hasColorThemeStyles)
       }
@@ -247,6 +281,7 @@
       imageLoader(instance);
       utils.loaded += 1;
 
+
       if (utils.loaded == utils.loaders) {
         loadScripts();
       } else {
@@ -321,6 +356,7 @@
 
   let initContentLoads = () => {
     let contentLoads = document.querySelectorAll('[data-wm-plugin="load"]');
+    if (!contentLoads.length) return;
     for (let el of contentLoads) {
       if (el.classList.contains('wm-load-container')) continue;
       new LoadContent(el);
