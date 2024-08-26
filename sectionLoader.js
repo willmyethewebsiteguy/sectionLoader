@@ -156,7 +156,12 @@
       initializeCommerce(container)
     }
     function initWMPlugins() {
-      window.wmListSectionSync?.init()
+      if (typeof window.wmListSectionSync?.init === 'function') {
+          window.wmListSectionSync.init();
+      }
+      if (typeof window.wmSectionSlider?.init === 'function') {
+          window.wmSectionSlider.init();
+      }
     }
     function initializeCommerce(container) {
       // Re-initializing Commerce can be risky. 
