@@ -18,7 +18,7 @@
   position: relative;
   box-sizing:border-box;
 }
-.wm-load-container .content-wrapper{
+.wm-load-container > section > .content-wrapper{
   padding: 0 !important;
 }
 .wm-load-container .content-wrapper > .content{
