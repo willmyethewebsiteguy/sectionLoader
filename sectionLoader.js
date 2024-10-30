@@ -179,7 +179,9 @@
           button.parentNode.replaceChild(clone, button);
         });
         // Reinitialize Squarespace Commerce
-        Y.Squarespace.Commerce.initializeCommerce();
+        if (typeof Y.Squarespace?.Commerce?.initializeCommerce === 'function') {
+          Y.Squarespace.Commerce.initializeCommerce();
+        }
       }
     }
 
