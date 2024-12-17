@@ -319,6 +319,8 @@
           let selector = null;
           if (target.includes(' ')) {
             selector = target.split(' ').slice(1).join(' ');
+          } else if (target.includes('#')) {
+            selector = '#' + target.split('#')[1];
           }
           return selector;
         }
