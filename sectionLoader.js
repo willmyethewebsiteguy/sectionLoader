@@ -19,7 +19,8 @@
         let response = await fetch(`${url}`);
         let isUserValue = true;
         if (!selector) {
-          selector = utils.templateVersion == '7' ? 'main > *:first-child' : '#sections' ;
+          selector =
+            utils.templateVersion == "7" ? "main > *:first-child" : "#sections";
           isUserValue = false;
         }
 
@@ -29,57 +30,64 @@
         }
 
         let data = await response.text(),
-            frag = document.createRange().createContextualFragment(data),
-            section = frag.querySelector(selector).innerHTML;
+          frag = document.createRange().createContextualFragment(data),
+          section = frag.querySelector(selector).innerHTML;
 
         if (isUserValue) section = frag.querySelector(selector).outerHTML;
 
         return section;
-
       } catch (error) {
-        return `<div class="load-plugin wm-alert"><p>Hey there, it looks like the url you are using, <code>${url}</code>, doesn't exist. Check the URL in the code block. And don't worry, this note is only showing in the Squarespace Editor, not on the live site.</p><p>If you continue to have issues, reach out to our team here: <a>https://will-myers.com/ask</a></p></div>`
+        return `<div class="load-plugin wm-alert"><p>Hey there, it looks like the url you are using, <code>${url}</code>, doesn't exist. Check the URL in the code block. And don't worry, this note is only showing in the Squarespace Editor, not on the live site.</p><p>If you continue to have issues, reach out to our team here: <a>https://will-myers.com/ask</a></p></div>`;
         console.error(error);
       }
     },
     getPropertyValue: function (el, prop) {
       let propValue = window.getComputedStyle(el).getPropertyValue(prop),
-          cleanedValue = propValue.trim().toLowerCase(),
-          value = cleanedValue;
+        cleanedValue = propValue.trim().toLowerCase(),
+        value = cleanedValue;
 
       /*If First & Last Chars are Quotes, Remove*/
-      if (cleanedValue.charAt(0).includes('"') || cleanedValue.charAt(0).includes("'")) value = value.substring(1);
-      if (cleanedValue.charAt(cleanedValue.length-1).includes('"') || cleanedValue.charAt(cleanedValue.length-1).includes("'")) value = value.slice(0, -1);;
+      if (
+        cleanedValue.charAt(0).includes('"') ||
+        cleanedValue.charAt(0).includes("'")
+      )
+        value = value.substring(1);
+      if (
+        cleanedValue.charAt(cleanedValue.length - 1).includes('"') ||
+        cleanedValue.charAt(cleanedValue.length - 1).includes("'")
+      )
+        value = value.slice(0, -1);
 
-      if (cleanedValue == 'true') value = true;
-      if (cleanedValue == 'false') value = false;
+      if (cleanedValue == "true") value = true;
+      if (cleanedValue == "false") value = false;
 
       return value;
     },
     loaders: document.querySelectorAll('[data-wm-plugin="load"]').length,
     loaded: 0,
     templateVersion: Static.SQUARESPACE_CONTEXT.templateVersion,
-    loadScripts: []
+    loadScripts: [],
   };
 
   function loadScripts() {
     if (!utils.loadScripts.length) {
-      utils.emitEvent('wmSectionLoader:scriptsLoaded');
+      utils.emitEvent("wmSectionLoader:scriptsLoaded");
       return;
     }
-  
+
     const hasLoaded = [];
     const scriptPromises = [];
-  
+
     for (let el of utils.loadScripts) {
       //if (hasLoaded.includes(el.src) || hasLoaded.includes(el.innerHTML) || el.type === 'application/json') continue;
-      if (el.type === 'application/json') continue;
-  
+      if (el.type === "application/json") continue;
+
       const promise = new Promise((resolve, reject) => {
-        const script = document.createElement('script');
+        const script = document.createElement("script");
         script.src = el.src;
         script.async = el.async;
         script.onload = () => {
-          //console.log(`${el.src} loaded successfully`);
+          // console.log(`${el.src} loaded successfully`);
           resolve();
         };
         script.onerror = () => {
@@ -88,7 +96,7 @@
         };
 
         const isInternalScript = !!el.innerHTML.trim();
-  
+
         if (isInternalScript) {
           eval(el.innerHTML);
           hasLoaded.push(el.innerHTML);
@@ -102,96 +110,147 @@
       });
       scriptPromises.push(promise);
     }
-  
+
     Promise.allSettled(scriptPromises)
       .then(() => {
         // All scripts have loaded, fire the custom event
-        utils.emitEvent('wmSectionLoader:scriptsLoaded');
+        // dataControllerMap.forEach((value, element) => {
+        //   element.setAttribute("data-controller", value);
+        // });
+        utils.emitEvent("wmSectionLoader:scriptsLoaded");
       })
       .catch(error => {
-        console.error('Error loading scripts:', error);
-      });
-
+        // dataControllerMap.forEach((value, element) => {
+        //   element.setAttribute("data-controller", value);
+        // });
+        console.error("Error loading scripts:", error);
+      })
   }
-  
+
   window.refactorSectionDividers = () => {
-    const loadSections = document.querySelectorAll('.page-section.has-section-divider:has(.wm-load-container)');
+    const loadSections = document.querySelectorAll(
+      ".page-section.has-section-divider:has(.wm-load-container)"
+    );
 
     loadSections.forEach(section => {
-      if (section.querySelector(':scope > .section-divider-display style[data-wm-section-divider-style]')) return;
+      if (
+        section.querySelector(
+          ":scope > .section-divider-display style[data-wm-section-divider-style]"
+        )
+      )
+        return;
       // Find the existing style element in the section
-      const dividerStyles = section.querySelector(':scope > .section-divider-display style[data-section-divider-style]');
+      const dividerStyles = section.querySelector(
+        ":scope > .section-divider-display style[data-section-divider-style]"
+      );
       if (!dividerStyles) return;
-      
+
       // Find the next section or the section in the #footer-sections
-      let nextSection = section.nextElementSibling || document.querySelector('#footer-sections > .page-section');
+      let nextSection =
+        section.nextElementSibling ||
+        document.querySelector("#footer-sections > .page-section");
       if (!nextSection) return;
-    
+
       // Get the new section ID from the next section
-      const newSectionId = nextSection?.getAttribute('data-section-id');
+      const newSectionId = nextSection?.getAttribute("data-section-id");
       if (!newSectionId) return;
-    
+
       // Extract the --divider-height value from the current section's custom properties
-      const dividerHeight = getComputedStyle(section).getPropertyValue('--divider-height').trim();
+      const dividerHeight = getComputedStyle(section)
+        .getPropertyValue("--divider-height")
+        .trim();
       if (!dividerHeight) return;
-    
+
       // Create the new CSS rule
       const newRule = `[data-section-id="${newSectionId}"] { --wm-adjusted-previous-section-divider-offset: ${dividerHeight}; }`;
-    
+
       // Create a new style element
-      const newStyleElement = document.createElement('style');
-      newStyleElement.setAttribute('data-wm-section-divider-style', '');
+      const newStyleElement = document.createElement("style");
+      newStyleElement.setAttribute("data-wm-section-divider-style", "");
       newStyleElement.textContent = newRule;
 
-      dividerStyles.parentNode.insertBefore(newStyleElement, dividerStyles.nextSibling);
-    })
-  }
+      dividerStyles.parentNode.insertBefore(
+        newStyleElement,
+        dividerStyles.nextSibling
+      );
+    });
+  };
 
-  let LoadContent = (function () {    
-    function loadSquarespaceContent(instance){
+  let LoadContent = (function () {
+    function loadSquarespaceContent(instance) {
       let container = instance.elements.container;
       window.Squarespace?.initializeLayoutBlocks(Y, Y.one(container));
       window.Squarespace?.initializeNativeVideo(Y, Y.one(container));
-      window.Squarespace?.initializePageContent(Y, Y.one(container))
-      initializeCommerce(container)
+      window.Squarespace?.initializePageContent(Y, Y.one(container));
+      initializeCommerce(container);
     }
     function initWMPlugins() {
-      if (typeof window.wmListSectionSync?.init === 'function') {
-          window.wmListSectionSync.init();
+      if (typeof window.wmListSectionSync?.init === "function") {
+        window.wmListSectionSync.init();
       }
-      if (typeof window.wmSectionSlider?.init === 'function') {
-          window.wmSectionSlider.init();
+      if (typeof window.wmSectionSlider?.init === "function") {
+        window.wmSectionSlider.init();
       }
     }
     function initializeCommerce(container) {
-      // Re-initializing Commerce can be risky. 
+      // Re-initializing Commerce can be risky.
       // Remove all "add to cart buttons" first and replace them
       // so you don't double add products
       const shouldInitialize = !!container.querySelectorAll(
-        '.sqs-add-to-cart-button',
+        ".sqs-add-to-cart-button"
       ).length;
-      const allAddToCartButtons = document.querySelectorAll('.sqs-add-to-cart-button');
-      
+      const allAddToCartButtons = document.querySelectorAll(
+        ".sqs-add-to-cart-button"
+      );
+
       if (shouldInitialize) {
+        
+        const afterpayComponents = document.querySelectorAll(
+          '[data-afterpay="true"]'
+        );
+        const context = window.Static?.SQUARESPACE_CONTEXT;
+        const nativeProductReviewsEnabled =
+          context?.websiteSettings?.storeSettings?.merchandisingSettings
+            ?.displayNativeProductReviewsEnabled;
+       const importedProductReviewsEnabled =
+          context?.websiteSettings?.storeSettings?.merchandisingSettings
+            ?.displayImportedProductReviewsEnabled;
+        // Temporarily disable Afterpay and native product reviews
+        afterpayComponents.forEach(el => el.removeAttribute("data-afterpay"));
+        if (context?.websiteSettings?.storeSettings?.merchandisingSettings) {
+          context.websiteSettings.storeSettings.merchandisingSettings.displayNativeProductReviewsEnabled = false;
+          context.websiteSettings.storeSettings.merchandisingSettings.displayImportedProductReviewsEnabled = false;
+          console.log('disabled', nativeProductReviewsEnabled)
+        }
         // For each button, replace it with a clone to remove event listeners
         allAddToCartButtons.forEach(button => {
           const clone = button.cloneNode(true);
           button.parentNode.replaceChild(clone, button);
         });
         // Reinitialize Squarespace Commerce
-        if (typeof Y.Squarespace?.Commerce?.initializeCommerce === 'function') {
+        if (typeof Y.Squarespace?.Commerce?.initializeCommerce === "function") {
           Y.Squarespace.Commerce.initializeCommerce();
+        }
+
+        afterpayComponents.forEach(el => el.setAttribute('data-afterpay', 'true'));
+        if (context?.websiteSettings?.storeSettings?.merchandisingSettings) {
+          console.log('enabled')
+            context.websiteSettings.storeSettings.merchandisingSettings.displayNativeProductReviewsEnabled = nativeProductReviewsEnabled;
+          context.websiteSettings.storeSettings.merchandisingSettings.displayImportedProductReviewsEnabled = importedProductReviewsEnabled;
         }
       }
     }
 
-    function pushScripts(instance){
-      let allow = utils.getPropertyValue(instance.elements.container, '--load-scripts'),
-          scripts = instance.elements.scripts;
+    function pushScripts(instance) {
+      let allow = utils.getPropertyValue(
+          instance.elements.container,
+          "--load-scripts"
+        ),
+        scripts = instance.elements.scripts;
 
-      if (allow === 'false' || allow === false) return;
+      if (allow === "false" || allow === false) return;
       if (!scripts.length) return;
-      scripts.forEach(el => utils.loadScripts.push(el))
+      scripts.forEach(el => utils.loadScripts.push(el));
     }
     function pushSqsSpecificScripts(instance) {
       /*Like Background Videos*/
@@ -200,19 +259,28 @@
       let hasListSection = instance.elements.listSection.length;
       let hasGallerySection = instance.elements.gallerySection.length;
       let hasBkgFx = instance.elements.bkgFx.length;
-      let hasColorThemeStyles = document.head.querySelector('#colorThemeStyles');
+      let hasColorThemeStyles =
+        document.head.querySelector("#colorThemeStyles");
       let hasShapeBlocks = instance.elements.shapeBlocks.length;
-      
+
       /*If Background Video or Gallery Section*/
-      if (hasBkgVideos || hasListSection || hasGallerySection || hasBkgFx || hasProductItems) {
-        let sqsLoaderScript = document.querySelector('body > [src*="https://static1.squarespace.com/static/vta"]');
-        utils.loadScripts.push(sqsLoaderScript)
+      if (
+        hasBkgVideos ||
+        hasListSection ||
+        hasGallerySection ||
+        hasBkgFx ||
+        hasProductItems
+      ) {
+        let sqsLoaderScript = document.querySelector(
+          'body > [src*="https://static1.squarespace.com/static/vta"]'
+        );
+        utils.loadScripts.push(sqsLoaderScript);
       }
 
       if (hasShapeBlocks) {
-        loadShapeBlocks(instance)
+        loadShapeBlocks(instance);
       }
-      window.refactorSectionDividers()
+      window.refactorSectionDividers();
       if (hasColorThemeStyles) {
         //addModifiedStyleElement(hasColorThemeStyles)
       }
@@ -221,21 +289,21 @@
       //if (!document.body.classList.contains('sqs-edit-mode')) return;
       let bkgImages = instance.elements.bkgImages;
       let summaryImages = instance.elements.summaryImages;
-      const images = [...bkgImages, ...summaryImages]
+      const images = [...bkgImages, ...summaryImages];
       images.forEach(el => {
-        el.classList.add('wm-image-loaded')
-        let fData = el.dataset.imageFocalPoint.split(',');
+        el.classList.add("wm-image-loaded");
+        let fData = el.dataset.imageFocalPoint.split(",");
         let focalPoint = {};
-        focalPoint.x = (parseFloat(fData[0]) * 100) + '%';
-        focalPoint.y = (parseFloat(fData[1]) * 100) + '%';
-        el.style.setProperty('--x', focalPoint.x);
-        el.style.setProperty('--y', focalPoint.y);     
+        focalPoint.x = parseFloat(fData[0]) * 100 + "%";
+        focalPoint.y = parseFloat(fData[1]) * 100 + "%";
+        el.style.setProperty("--x", focalPoint.x);
+        el.style.setProperty("--y", focalPoint.y);
         el.dataset.load = true;
-        el.src = el.dataset.src
-      })
+        el.src = el.dataset.src;
+      });
     }
     function loadShapeBlocks(instance) {
-      if (document.querySelector('style#wm-shape-block-styles')) return;
+      if (document.querySelector("style#wm-shape-block-styles")) return;
       addStyles();
 
       function addStyles() {
@@ -264,10 +332,10 @@
             position: relative;
             color: var(--shape-block-dropshadow-color);
           }`;
-          
-        const styleElement = document.createElement('style');
-        styleElement.id = 'wm-shape-block-styles'
-        styleElement.type = 'text/css';
+
+        const styleElement = document.createElement("style");
+        styleElement.id = "wm-shape-block-styles";
+        styleElement.type = "text/css";
         styleElement.appendChild(document.createTextNode(styleContent));
         document.head.appendChild(styleElement);
       }
@@ -275,12 +343,12 @@
 
     async function buildHTML(instance) {
       let container = instance.elements.container,
-          target = instance.settings.target,
-          url = instance.settings.url,
-          selector = instance.settings.selector;
-      
+        target = instance.settings.target,
+        url = instance.settings.url,
+        selector = instance.settings.selector;
+
       let html = await utils.getHTML(url, selector);
-      container.insertAdjacentHTML('afterbegin', html);
+      container.insertAdjacentHTML("afterbegin", html);
       loadSquarespaceContent(instance);
       initWMPlugins();
       pushScripts(instance);
@@ -288,15 +356,14 @@
       imageLoader(instance);
       utils.loaded += 1;
 
-
       if (utils.loaded == utils.loaders) {
         loadScripts();
       } else {
-        utils.emitEvent('wmSectionLoader:scriptsLoaded');
+        utils.emitEvent("wmSectionLoader:scriptsLoaded");
       }
-      utils.emitEvent('wmSectionLoader:loaded', {
+      utils.emitEvent("wmSectionLoader:loaded", {
         block: container,
-        target: target ? target : null
+        target: target ? target : null,
       });
 
       return container;
@@ -311,67 +378,81 @@
         get url() {
           let target = this.target;
           let url = this.target;
-          if (url.includes(' ')) url = target.split(' ')[0];
+          if (url.includes(" ")) url = target.split(" ")[0];
           return url;
         },
         get selector() {
           let target = this.target;
           let selector = null;
-          if (target.includes(' ')) {
-            selector = target.split(' ').slice(1).join(' ');
-          } else if (target.includes('#')) {
-            selector = '#' + target.split('#')[1];
+          if (target.includes(" ")) {
+            selector = target.split(" ").slice(1).join(" ");
+          } else if (target.includes("#")) {
+            selector = "#" + target.split("#")[1];
           }
           return selector;
-        }
+        },
       };
       instance.elements = {
         container: el,
         get scripts() {
-          return this.container.querySelectorAll('script');
+          return this.container.querySelectorAll("script");
         },
         get bkgVideos() {
-          return this.container.querySelectorAll('.section-background .sqs-video-background-native');
+          return this.container.querySelectorAll(
+            ".section-background .sqs-video-background-native"
+          );
         },
         get bkgImages() {
-          return this.container.querySelectorAll('.section-background > img:not(.wm-image-loaded)');
+          return this.container.querySelectorAll(
+            ".section-background > img:not(.wm-image-loaded)"
+          );
         },
         get bkgFx() {
-          return this.container.querySelectorAll('.background-fx-canvas');
+          return this.container.querySelectorAll(".background-fx-canvas");
         },
         get productItems() {
-          return this.container.querySelectorAll('article.ProductItem .ProductItem-summary');
+          return this.container.querySelectorAll(
+            "article.ProductItem .ProductItem-summary"
+          );
         },
         get summaryImages() {
-          return this.container.querySelectorAll('.summary-item .summary-thumbnail img');
+          return this.container.querySelectorAll(
+            ".summary-item .summary-thumbnail img"
+          );
         },
         get shapeBlocks() {
-          return this.container.querySelectorAll('.sqs-block[data-definition-name="website.components.shape"]');
+          return this.container.querySelectorAll(
+            '.sqs-block[data-definition-name="website.components.shape"]'
+          );
         },
         get listSection() {
-          return this.container.querySelectorAll('.page-section.user-items-list-section');
+          return this.container.querySelectorAll(
+            ".page-section.user-items-list-section"
+          );
         },
         get gallerySection() {
-          return this.container.querySelectorAll('.page-section.gallery-section');
-        }
+          return this.container.querySelectorAll(
+            ".page-section.gallery-section"
+          );
+        },
       };
 
-      instance.elements.container.classList.add('wm-load-container')
+      instance.elements.container.classList.add("wm-load-container");
       buildHTML(instance);
     }
 
     return Constructor;
-  }());
+  })();
 
   let initContentLoads = () => {
     let contentLoads = document.querySelectorAll('[data-wm-plugin="load"]');
     if (!contentLoads.length) return;
     for (let el of contentLoads) {
-      if (el.classList.contains('wm-load-container')) continue;
+      if (el.classList.contains("wm-load-container")) continue;
       new LoadContent(el);
     }
-  }
+  };
   initContentLoads();
-  window.addEventListener('mercury:load', initContentLoads)
+  window.addEventListener("mercury:load", initContentLoads);
   window.wmInitContentLoad = initContentLoads;
-}());
+})();
