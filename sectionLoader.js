@@ -220,7 +220,6 @@
         if (context?.websiteSettings?.storeSettings?.merchandisingSettings) {
           context.websiteSettings.storeSettings.merchandisingSettings.displayNativeProductReviewsEnabled = false;
           context.websiteSettings.storeSettings.merchandisingSettings.displayImportedProductReviewsEnabled = false;
-          console.log('disabled', nativeProductReviewsEnabled)
         }
         // For each button, replace it with a clone to remove event listeners
         allAddToCartButtons.forEach(button => {
@@ -234,8 +233,7 @@
 
         afterpayComponents.forEach(el => el.setAttribute('data-afterpay', 'true'));
         if (context?.websiteSettings?.storeSettings?.merchandisingSettings) {
-          console.log('enabled')
-            context.websiteSettings.storeSettings.merchandisingSettings.displayNativeProductReviewsEnabled = nativeProductReviewsEnabled;
+          context.websiteSettings.storeSettings.merchandisingSettings.displayNativeProductReviewsEnabled = nativeProductReviewsEnabled;
           context.websiteSettings.storeSettings.merchandisingSettings.displayImportedProductReviewsEnabled = importedProductReviewsEnabled;
         }
       }
