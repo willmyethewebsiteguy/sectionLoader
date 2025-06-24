@@ -301,8 +301,12 @@
       });
     }
     function loadShapeBlocks(instance) {
-      if (document.querySelector("style#wm-shape-block-styles")) return;
+      if (document.querySelector("style#wm-shape-block-styles")) {
+        unhideShapeBlocks();
+        return;
+      }
       addStyles();
+      unhideShapeBlocks();
 
       function addStyles() {
         const styleContent = `
@@ -336,6 +340,13 @@
         styleElement.type = "text/css";
         styleElement.appendChild(document.createTextNode(styleContent));
         document.head.appendChild(styleElement);
+
+
+      }
+      function unhideShapeBlocks() {
+        const selector = '.sqs-block[data-definition-name="website.components.shape"] .sqs-shape-block-container.hidden-stretch-block';
+        const hiddenShapeBlocks = document.querySelectorAll(selector);
+        hiddenShapeBlocks.forEach(el => el.classList.remove('hidden-stretch-block'));
       }
     }
 
